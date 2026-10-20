@@ -15,6 +15,7 @@ with revenue_calc AS(
     select date_trunc('month',created_at) as monthly,
     sum(total) as gross_revenue
     from orders
+    where lower(trim(status)) like 'delivered'
     GROUP BY date_trunc('month',created_at)
 ),
 prev_month as (
