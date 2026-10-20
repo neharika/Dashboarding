@@ -24,10 +24,20 @@ from total_orders;
 
 
 --KPI 8: Refund rate
+--19979,227,1.14
 set search_path to ecom;
-select distinct status from refunds
-
-select count(r.refund_id) as total_no_refunds,
-count(*) filter ()
+with order_count as(
+select count(distinct(order_id)) as total_orders 
+from orders
+where lower(trim(status))='delivered'
+),
+refund_orders as(
+select count(distinct(r.refund_id)) as total_no_refunds
 from refunds r join orders o ON
-r.order_id=o.order_id;
+o.order_id=r.order_id
+where r.status='succeeded' and 
+lower(trim(o.status)) = 'delivered'
+)
+select oc.total_orders,ro.total_no_refunds,
+round(ro.total_no_refunds*100.0/nullif(oc.total_orders,0),2) as refund_rate_pct
+from order_count oc cross join refund_orders ro ;

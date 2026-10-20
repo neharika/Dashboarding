@@ -1,5 +1,5 @@
---KPI 1:
---KPI 3: Gross Sales Revenue & AOV
+--KPI 1: Gross Sales Revenue 
+--KPI 3: Average Order Value (AOV)
 --150418237.66 & 7528.82
 
 set search_path to ecom;
@@ -11,7 +11,21 @@ and lower(trim(payment_status)) <>'failed';
 
 --KPI 4: Revenue Growth Rate
 set search_path to ecom;
-
+with revenue_calc AS(
+    select date_trunc('month',created_at) as monthly,
+    sum(total) as gross_revenue
+    from orders
+    GROUP BY date_trunc('month',created_at)
+),
+prev_month as (
+    select to_char(monthly,'yyyy-mm') as order_month,
+    gross_revenue,
+    lag(gross_revenue) over (order by monthly) as prev_month_revenue
+    from revenue_calc
+)
+select *,
+round((gross_revenue-prev_month_revenue)*100.0/nullif(prev_month_revenue,0),2) as growth_pct
+ from prev_month;
 
 --KPI 5: Top 5 Products by Revenue (Delivered)
 set search_path to ecom;
