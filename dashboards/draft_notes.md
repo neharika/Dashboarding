@@ -1,4 +1,3 @@
-![alt text](Draft_Dashboard.png)
 
 # Dashboard Draft Notes — E-commerce Executive Dashboard
 
