@@ -1,64 +1,81 @@
-# Dashboard Design Decisions — E-commerce Executive Dashboard
+# Dashboard Design Rationale — E-commerce Executive Dashboard
 
 ## 1. Design Objective
 
-The dashboard is designed to give an executive a concise overview of e-commerce performance. It brings together revenue, order volume, average order value, cancellations, refunds, product performance, geographic performance, and monthly revenue trends in a single view.
+The dashboard is designed to help an executive assess e-commerce performance quickly, identify areas requiring attention, and explore the factors behind revenue changes. The layout prioritizes headline KPIs before moving to product, geographic, and monthly performance.
 
-The design prioritizes quick interpretation while allowing users to investigate specific products and markets when needed.
+The design balances a compact executive overview with enough detail to support follow-up analysis.
 
-## 2. Layout and Visual Hierarchy
+## 2. Layout and Positioning
 
-The dashboard follows a top-down reading order.
+### Dashboard title and reporting context — top centre
 
-The KPI section appears at the top so that the most important business measures are visible before the user examines individual charts. The product, country, and monthly trend views sit below the headline metrics, providing context for the overall results.
+The title, *E-commerce Executive Dashboard*, is positioned at the top centre to establish the dashboard's purpose immediately. A short subtitle identifies the reporting context and data scope, helping users understand what the figures represent.
 
-This layout separates high-level performance monitoring from deeper analysis. It also reduces the need to navigate between multiple worksheets to understand the business at a glance.
+### KPI summary — directly below the title
 
-## 3. KPI Selection
+The KPI section is placed above the charts because executives typically need to understand overall performance before examining individual categories. Keeping these figures together also makes it easier to compare revenue, order volumes, AOV, cancellations, and refunds.
 
-The headline metrics were selected to cover different aspects of business performance:
+The revised KPI labels distinguish orders placed from orders delivered. Delivered AOV and refund rate are explicitly associated with their relevant populations to reduce ambiguity.
 
-- **Delivered Revenue** measures revenue associated with delivered orders.
-- **Orders Placed** indicates overall order demand.
-- **Orders Delivered** shows how many orders reached the delivery stage.
-- **Delivered AOV** measures average revenue per eligible delivered order.
-- **Cancellation Rate** highlights the proportion of orders cancelled.
-- **Refund Rate** measures the proportion of eligible delivered orders associated with successful refunds, according to the defined metric.
+### Product and country charts — middle section
 
-Separating placed orders from delivered orders is important because not every order placed is ultimately delivered. The labels also make the population used for AOV clearer and reduce the risk of comparing incompatible figures.
+The product and country views sit side by side beneath the KPIs. This creates a comparison between **what sells** and **where revenue comes from** without requiring the viewer to navigate to separate worksheets.
 
-## 4. Chart Selection
+### Monthly trend — lower section
 
-### Top Products by Revenue
+The monthly trend is positioned below the product and country views. This gives the dashboard a logical progression from overall performance to category-level comparisons and then to performance over time.
 
-A horizontal bar chart supports comparisons across product names. Bar length makes differences in revenue easy to assess, while horizontal labels provide more room for longer product names. Limiting the view to the top five products keeps the chart focused on the strongest revenue contributors.
+## 3. Chart-Type Decisions
 
-### Revenue by Country
+### Top Five Products by Revenue — horizontal bar chart
 
-A bar chart compares revenue across countries using a common quantitative scale. It helps identify the markets contributing most to delivered revenue. Missing or unavailable country values are grouped under a clear category rather than being silently excluded.
+A horizontal bar chart was selected because product names can be long. Horizontal labels remain easier to read than labels rotated beneath vertical bars. Bar length also makes revenue differences straightforward to compare.
 
-### Monthly Revenue Trend
+The chart is restricted to the five highest-revenue products to maintain focus and prevent a long product list from dominating the dashboard. Revenue is encoded by bar length, with a common axis supporting direct comparison.
 
-A monthly trend view shows how revenue changes over time. Month-over-month growth complements revenue values by showing the relative change from one month to the next. This helps distinguish the size of monthly revenue from the direction and pace of change.
+### Revenue by Country — vertical bar chart
 
-## 5. Interactivity
+A vertical bar chart was selected to compare revenue across a relatively small number of country categories. The shared quantitative axis makes differences in contribution easy to see.
 
-Country and product filters allow users to narrow the analysis to a particular market or product. These controls support follow-up questions without requiring separate dashboards for every possible selection.
+Country names appear along the horizontal axis, while bar height represents revenue. Unavailable country values are grouped under a clearly labelled category rather than being silently omitted. This preserves visibility into records with incomplete geographic information.
 
-Filters should be applied consistently to the relevant worksheets. KPI values should respond only where the selected dimension is meaningful to the metric, and the dashboard should be tested to ensure that filtering does not unintentionally change the underlying business definition.
+### Monthly Revenue and Growth — time-series chart
 
-## 6. Formatting and Design Trade-offs
+A line-based time-series chart was chosen because months have a natural chronological order and the main question concerns movement over time. Connecting the monthly values makes increases, decreases, and turning points easier to identify.
 
-The dashboard uses a compact single-screen layout to make the main information accessible without excessive scrolling. Number formatting, clear metric names, consistent units, and readable chart labels are important because executives should not need to infer whether a value represents revenue, an order count, or a percentage.
+Revenue and month-over-month growth represent different concepts: revenue measures scale, while growth measures percentage change. They should therefore have clearly differentiated labels and formatting. If both are shown on the same chart, their scales must remain understandable and must not imply that a percentage is a currency amount.
 
-The design balances information density with readability. A limited number of headline metrics and a focused top-five product view reduce clutter while retaining useful business context.
+## 4. Colour Decisions
 
-## 7. Limitations and Future Improvements
+Blue is used for the product revenue bars because it provides a consistent, restrained visual treatment for ranked comparisons. Using the same colour across products keeps attention on bar length rather than decorative variation.
 
-The dashboard reflects the available data and the definitions used for each KPI. Future improvements could include date-range controls, targets or benchmarks, annotations for significant changes, and additional investigation of unusually large monthly movements.
+Country bars use distinct colours to make individual categories easier to distinguish. These colours are categorical, not performance rankings: the colour itself should not imply that one country is good or bad. Country names and the revenue axis remain the primary means of interpretation.
 
-Before using the dashboard for operational decisions, the displayed figures should continue to be reconciled with the corresponding SQL calculations and the agreed business definitions.
+The monthly trend uses a contrasting line to separate the time-series view visually from the bar charts. Colour is used to distinguish chart elements, while position, length, and direction carry the quantitative meaning.
+
+The dashboard avoids unnecessary decorative colours so that the headline figures and significant changes remain the focus.
+
+## 5. Typography, Labels, and Number Formatting
+
+The dashboard uses a clear title hierarchy, compact KPI labels, and chart titles that describe the business question being answered. Metric names should use plain language rather than relying exclusively on database-style field names.
+
+Revenue values use consistent currency and number formatting. Order counts are displayed as whole numbers. Cancellation and refund rates include percentage signs and appropriate decimal precision.
+
+This is particularly important for the refund rate: displaying **1.14%** is clearer than showing `1.140` without a unit. Similarly, labelling the AOV as *Delivered AOV* clarifies which orders are included.
+
+## 6. Filters and Interaction
+
+Country and product filters allow users to investigate specific markets and products without creating separate dashboards for each selection. Their placement should make them discoverable without competing visually with the KPI summary.
+
+The filters should update the intended charts and relevant measures consistently. Testing should confirm that filtering does not unintentionally alter a KPI's denominator or change its business definition.
+
+## 7. Trade-offs and Future Improvements
+
+A single-screen layout improves scanability but limits the amount of detail that can be displayed. The top-five product restriction is an intentional trade-off: it emphasizes the leading contributors rather than attempting to show the entire catalogue.
+
+Future iterations could add date-range controls, revenue targets, explanatory annotations for unusual monthly movements, and accessible colour choices verified across different displays.
 
 ## Conclusion
 
-The design aims to make the dashboard useful for both rapid executive review and focused exploration. Its KPI hierarchy, comparative charts, monthly trend, and filters support a clearer understanding of e-commerce performance while keeping the underlying metric definitions explicit.
+The design uses placement to establish reading order, chart type to match the analytical question, and colour to distinguish categories without replacing quantitative evidence. Consistent labels and units support accurate interpretation, while filters let executives move from a summary view to focused analysis.
