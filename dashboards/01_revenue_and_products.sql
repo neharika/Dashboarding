@@ -13,13 +13,18 @@ and lower(trim(payment_status)) <>'failed';
 set search_path to ecom;
 with revenue_calc AS(
     select date_trunc('month',created_at) as monthly,
+    min(created_at) as first_order_date,
+    max(created_at) as last_order_date,
+    COUNT(*) AS total_orders,
     sum(total) as gross_revenue
     from orders
     where lower(trim(status)) like 'delivered'
+    and LOWER(TRIM(payment_status)) <> 'failed'
     GROUP BY date_trunc('month',created_at)
 ),
 prev_month as (
     select to_char(monthly,'yyyy-mm') as order_month,
+    first_order_date,last_order_date,total_orders,
     gross_revenue,
     lag(gross_revenue) over (order by monthly) as prev_month_revenue
     from revenue_calc
@@ -29,25 +34,26 @@ round((gross_revenue-prev_month_revenue)*100.0/nullif(prev_month_revenue,0),2) a
  from prev_month;
 
 --KPI 5: Top 5 Products by Revenue (Delivered)
-set search_path to ecom;
-with revenue_calculation as(
-    SELECT p.product_id,p.product_name,
-    sum(o.total) as gross_revenue from
-    orders o join order_items oi ON
-    o.order_id=oi.order_id join
-    product_variants pv ON 
-    pv.variant_id=oi.variant_id JOIN 
-    products p ON
-    pv.product_id=p.product_id
-    where lower(trim(o.status))='delivered'
-    and o.payment_status<>'failed'
-    group by p.product_id
-    )
-    select product_id,product_name,
-    round(gross_revenue,2) as Revenue_Generated
-    from revenue_calculation
-    ORDER BY Revenue_Generated desc
-    limit 5;
+SET search_path TO ecom;
+
+SELECT
+    p.product_id,
+    p.product_name,
+    ROUND(SUM(oi.line_total)::numeric, 2) AS revenue_generated
+FROM orders o
+JOIN order_items oi
+    ON o.order_id = oi.order_id
+JOIN product_variants pv
+    ON pv.variant_id = oi.variant_id
+JOIN products p
+    ON p.product_id = pv.product_id
+WHERE LOWER(TRIM(o.status)) = 'delivered'
+  AND LOWER(TRIM(o.payment_status)) <> 'failed'
+GROUP BY
+    p.product_id,
+    p.product_name
+ORDER BY revenue_generated DESC
+LIMIT 5;
 
 --KPI 6: Revenue by Country
 set search_path to ecom;
