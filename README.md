@@ -20,12 +20,12 @@ The dashboard brings together revenue, order volume, average order value, cancel
 
 | Metric | Result |
 |---|---:|
-| Delivered revenue | 150.42 million* |
-| Delivered orders | 19,980 |
-| Average order value | 7,528.82* |
-| Total orders placed | 40,000 |
-| Cancellation rate | 5.45% |
-| Refund rate on delivered orders | 1.14% |
+| Delivered revenue                 | 150.42 million* |
+| Delivered orders                  | 19,980 |
+| Average order value               | 7,528.82* |
+| Total orders placed               | 40,000 |
+| Cancellation rate                 | 5.45% |
+| Refund rate on delivered orders   | 1.14% |
 
 *Revenue and average order value are shown in the dataset's monetary units; the currency has not been independently verified.*
 
